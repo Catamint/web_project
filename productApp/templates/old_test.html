@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <form method="POST">
+        {% csrf_token %}
+        <label>爱情<input type="checkbox" name="category" value="love"></label>
+        <label>科幻<input type="checkbox" name="category" value="science-fiction"></label>
+        <label>历史<input type="checkbox" name="category" value="history"></label>
+        <button type="submit">筛选</button>
+    </form>
+    <h2>电影列表</h2>
+    <ul id="movies">
+    </ul>
+    <script>
+        $('input[type="checkbox"]').click(function() {
+            var categories = [];
+            $('input[type="checkbox"]:checked').each(function() {
+                categories.push($(this).val());
+            });
+            $.ajax({
+                type: 'POST',
+                url: '/movie/',
+                data: {
+                    'category': categories
+                },
+                success: function(data) {
+                    $('#movies').empty();
+                    data.movies.forEach(function(movie) {
+                        $('#movies').append('<li>' + movie.name + ' - ' + movie.category + '</li>');
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}请确认订单信息{% endblock %}
+
+{% block content %}
+    <div class="container" style="height: calc(100vh - 70px);">
+        <h1 class="sub-head">请确认订单信息</h1>
+        <div class="row" style="height: calc(50% - 350px);"></div>
+        <div class="row">
+            <!-- pics -->
+            <div class="col-md-5">
+            </div>
+            <!-- details -->
+            <div class="col-md-6">
+                <div class="card letter" style="aspect-ratio: 4/3 ">
+                    <div class="d-flex align-content-center justify-content-center m-3" style="height: 100%;">
+                        <div class="align-self-center m-3" 
+                            style="background-image: url('{{movie.photo.url}}');
+                                    width: 35%; aspect-ratio: 1/1;
+                                    background-size: cover;
+                                    border-radius: 6px;">
+                        </div>
+                        <div class="align-self-center m-3" 
+                            style="width: 200px; height: 200px;
+                                background-size: cover;
+                                border-radius: 6px;">
+                            <p class="m-1">片名：{{session.movie.name}}</p>
+                            <p class="m-1">时间：{{session.time.year}}年{{session.time.month}}月{{session.time.day}}日 {{session.time.hour}}:{{session.time.minute}}</p>
+                            <p class="m-1">放映厅：{{session.location.name}}</p>
+                            <p class="m-1">票价：{{session.charge}}</p>
+                            <form id="myForm" method="post">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                  <div class="input-group">
+                                    <label class="align-self-center mx-1">数量：</label>
+                                    <div class="input-group-prepend">
+                                      <button class="btn btn-outline-secondary" type="button" id="minusBtn">&#8722;</button>
+                                    </div>
+                                    <input type="text" class="form-control" id="quantity" name="quantity" value="1" readonly>
+                                    <div class="input-group-append">
+                                      <button class="btn btn-outline-secondary" type="button" id="addBtn">&#43;</button>
+                                    </div>
+                                  </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary m-1" style="width: 100%;">提交</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<style type="text/css">
+    body{
+        background-image:url("{% static '/img/evelope.png' %}");
+    }
+</style>
+<!-- <script type="text/JavaScript">
+    $('#base0').css("background-image", "url('{% static '/img/evelope.png' %}')");
+</script> -->
+
+<script>
+    // 选择按钮和数量输入框
+    var minusBtn = $("#minusBtn");
+    var addBtn = $("#addBtn");
+    var quantityInput = $("#quantity");
+
+    // 定义最小和最大数量
+    var minQuantity = 0;
+    var maxQuantity = 10;
+
+    // 当减少按钮被点击时，将数量减1
+    minusBtn.on("click", function() {
+    var quantity = parseInt(quantityInput.val());
+    if (quantity > minQuantity) {
+        quantityInput.val(quantity - 1);
+    }
+    });
+
+    // 当增加按钮被点击时，将数量加1
+    addBtn.on("click", function() {
+    var quantity = parseInt(quantityInput.val());
+    if (quantity < maxQuantity) {
+        quantityInput.val(quantity + 1);
+    }
+    });
+
+    // 当表单被提交时，获取当前数量并发送到服务器
+    $("form").on("submit", function(event) {
+    var quantity = parseInt(quantityInput.val());
+    console.log("提交数量为：" + quantity);
+    // event.preventDefault(); // 阻止表单默认提交行为
+    });
+</script>
+
+{% endblock %}

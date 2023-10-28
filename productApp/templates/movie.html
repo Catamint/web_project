@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{movie.name}}-电影{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <!-- pics -->
+    <div class="col-md-4">
+      <div class="d-flex align-content-center justify-content-center">
+        <div class="pic-head"
+          style="background-image: url('{{movie.photo.url}}');"></div>
+      </div>
+    </div>
+    <!-- details -->
+    <div class="col-md-8">
+      <h1 class="mx-2 sub-head">{{movie.name}}</h1>
+      <p>
+        <span class="m-2 h5">评分：{{rate}}/5.0</span>
+        <span class="m-2 h5">年代：{{movie.time_publish.year}}</span>
+        {% for label in labels %}<span class="badge text-bg-primary m-1">{{label}}</span>{% endfor %}
+      </p>
+      <p>{{movie.inform}}</p>
+
+      <div id="simple-list-example">
+
+        {% if is_favorite %}
+        <a class="btn btn-danger"
+          href="{% url 'productApp:add_fav_url' movie.id 'del' %}"><i
+            class="bi bi-heart-fill"></i> 已收藏</a>
+        {% else %}
+        <a class="btn btn-outline-danger"
+          href="{% url 'productApp:add_fav_url' movie.id 'add' %}"><i
+            class="bi bi-heart"></i> 想看</a>
+        {% endif %}
+
+        {% if movie.showing %}
+        <a href="#buy_ticket_head" class="btn btn-primary">购票</a>
+        {% else %}
+        <a href="#buy_ticket_head" class="btn btn-primary disabled">购票</a>
+        {% endif %}
+        <a href="#review_head" class="btn btn-success">评价</a>
+        <a href="#picture_head" class="btn btn-warning">剧照</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-9">
+        {% if movie.showing %}
+        <h2 class="sub-head" id="buy_ticket_head">购票</h2>
+        <div class="card">
+          <div class="card-header">
+            <ul class="nav nav-pills card-header-pills">
+              {% for date in dates %}
+              <li class="nav-item">
+                <a class="nav-link"
+                  href="{% url 'productApp:movie_url' movie.id %}?date={{date}}#buy_ticket_head"
+                  id="date_{{date}}">{{date}}</a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              {% for session in sessions %}
+              <!-- 场次 -->
+              <div class="col-md-3 col-6">
+                <div class="card session-choice">
+                  <div class="card-body">
+                    <p class="card-text m-0">{{session.location.name}}</p>
+                    <p class="card-text m-0">{{session.time.time}}</p>
+                    <p class="card-text m-0">{{ session.ordered_seats }}/({{ session.location.total_seats}})个座位</p>
+                    <p class="card-text m-0 " style="color: green;">¥{{session.charge}}</p>
+                    {% if session.ordered_seats < session.location.total_seats %}
+                    <a class="btn btn-success" href="{% url 'productApp:ordering_url' session.id %}">预定</a>
+                    {% else %}
+                    <a class="btn btn-success disabled" role="button" aria-disabled="true">预定</a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            <p class="mb-0" style="color:red">{{request.GET.error_order}}</p>
+          </div>
+        </div>
+        {% endif %}
+
+        <h2 class="sub-head" id="review_head">短评</h2>
+        <!-- 写评论 -->
+        {% if user.is_authenticated %}
+        <div class="card mb-2">
+          <div class="ch card-header-pills"></div>
+          <div class="card-body row">
+            <div class="col-md-1 col-2">
+              <img class="img-fluid" style="width: 50px; height: 50px; border-radius: 50%; " src="{{request.user.other.photo.url}}" alt="">
+            </div>
+            <div class="col-md-11 col-10">
+              <form action method="post">
+                {% csrf_token %}
+                <div class="btn-group btn-group-sm mb-1"
+                  role="group"
+                  aria-label="Basic radio toggle button group">
+  
+                  <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" value='1'>
+                  <label class="btn btn-outline-danger radio-btn" for="btnradio1">1</label>
+  
+                  <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" value='2'>
+                  <label class="btn btn-outline-danger radio-btn" for="btnradio2">2</label>
+  
+                  <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off" value='3'>
+                  <label class="btn btn-outline-danger radio-btn" for="btnradio3">3</label>
+  
+                  <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off" value='4'>
+                  <label class="btn btn-outline-danger radio-btn" for="btnradio4">4</label>
+  
+                  <input type="radio" class="btn-check" name="btnradio" id="btnradio5" autocomplete="off" value='5' checked>
+                  <label class="btn btn-outline-danger radio-btn" for="btnradio5">5</label>
+                </div>
+                <span class="h6 text-danger"> /5.0分</span>
+                <textarea class="form-control mb-1" rows="2" type="textarea" id="comment" name="comment" placeholder="发表评论..."></textarea>
+                <button class="btn btn-success" type="submit">提交</button>
+                <p class="mb-0" style="color:red">{{request.GET.error}}</p>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="card mb-2">
+          <div class="card-body">
+            <h5 class="card-text">请登录之后再发表评论。</h5>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- views -->
+        {% for review in reviews_paged %}
+        <div class="card mb-1">
+          <div class="card-body">
+            <div class="d-flex mb-1">
+              <img class="img-fluid" style="vertical-align:middle; width: 50px; height: 50px; border-radius: 50%; " src="{{review.user.other.photo.url}}" alt="">
+              <div class="mb-1">
+                <p class="card-title h5 mx-2">{{review.user}}</p>
+                <p class="card-subtitle mx-2 text-muted">{{review.mark}} / 5.0分</p>
+                <p class="card-text mx-2 mb-0">{{review.body}}</p>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <p class="text-end mx-2 m-0" style="font-size: small; color: darkgray;">{{review.time |date:'Y-m-d'}} {{review.time |time:'H:i'}}</p>
+          </div>
+        </div>
+        {% endfor %}
+
+        <!-- 分页器 -->
+        <nav aria-label="...">
+          <ul class="pagination">
+            {% if reviews_paged.has_previous %}
+            {% if reviews_paged.previous_page_number != 1 %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1#review_head">1</a>
+            </li>
+            <li class="page-item disabled">
+              <a class="page-link" href>...</a>
+            </li>
+            {% endif %}
+            <li class="page-item">
+              <a class="page-link"
+                href="?page={{ reviews_paged.previous_page_number }}#review_head">{{ reviews_paged.previous_page_number }}</a>
+            </li>
+            {% endif %}
+            <li class="page-item active" aria-current="page">
+              <a class="page-link" href="#review_head">{{ reviews_paged.number }}</a>
+            </li>
+            {% if reviews_paged.has_next %}
+            <li class="page-item">
+              <a class="page-link"
+                href="?page={{ reviews_paged.next_page_number }}#review_head">{{ reviews_paged.next_page_number }}</a>
+            </li>
+            {% if reviews_paged.paginator.num_pages != reviews_paged.next_page_number %}
+            <li class="page-item disabled">
+              <a class="page-link" href>...</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link"
+                href="?page={{ reviews_paged.paginator.num_pages }}#review_head">{{ reviews_paged.paginator.num_pages }}</a>
+            </li>
+            {% endif %}
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+      <div class="col-md-3">
+        <h2 class="sub-head" id="picture_head">剧照</h2>
+        <div id="filmstrip">
+
+          {% for pic in pics %}
+          <div class="film">
+            <img src="{{pic.pic.url}}" alt="剧照">
+          </div>
+          {% endfor %}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<style type="text/css">
+    body{
+        background-image: linear-gradient(-10deg, rgba(231, 230, 230, 0.2) 0%, rgb(231, 230, 230) 30%), url('{{pics.0.pic.url}}');
+    }
+</style>
+
+<script type="text/JavaScript">
+    $('body').scrollspy({ target: '#simple-list-example' })
+</script>
+
+<script type="text/JavaScript">
+    $('#date_{{current_date}}').addClass("active");
+</script>
+
+<script type="text/JavaScript">
+    $('#{{active_submenu}}').addClass("active");
+</script>
+{% endblock %}

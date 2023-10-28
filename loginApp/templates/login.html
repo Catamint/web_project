@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}登录{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/login_style.css' %}">
+{% endblock css %}
+
+{% block content %}
+<div class="container content" style="height: calc(100vh - 70px);">
+    <!--  justify-content-around align-items-center -->
+    <div class="row" style="height: calc(50% - 200px);"></div>
+        <div class="row">
+        <div class="m-auto col-12 col-md-6">
+            <!-- glass-container -->
+            <div id="login_block" class="d-flex row m-0 align-content-center glass-container">
+                <div class="d-flex col-12 col-md-4 align-content-center justify-content-center">
+                    <h1>{{submenu}}</h1>
+                </div>
+                <div class="d-flex d-none d-lg-block col-md-1" style="height: 100%;">
+                    <div class="vr" style="height: 100%;"></div>
+                  </div>
+                <div class="d-flex col-12 col-md-6 justify-content-center">
+                    <form method="post" action="">
+                        {% csrf_token %}
+
+                        {% if submenu == '登录' %}
+                        <div class="form-floating" id="input-row">
+                            <input class="form-control" style="width: 100%;" type="text" id="username" name="username" placeholder="请输入账号">
+                            <label for="username">用户名</label>
+                        </div>
+                        <div class="form-floating" id="input-row">
+                            <input class="form-control" style="width: 100%;" type="password" id="password" name="password"
+                                placeholder="请输入密码">
+                            <label for="password">密码</label>
+                            <div id='error' style="color:red;">{{ error }}</div>
+                        </div>
+                        <div class="col-12">
+                            <button id="register" class="btn btn-primary" type="submit">
+                                <p>登录</p>
+                            </button>
+                            <a href="/u/Repassword2">
+                                <button id="register" type="button" class="btn btn-default">找回密码</button>
+                            </a>
+                        </div>
+
+                        {% else %}
+
+                        <div id="input-row">
+                            <input class="form-control" style="width: 100%;" type="text" id="username" name="username"    placeholder="请输入用户名">
+                            <div id='error' style="color:red">{{ userid }}</div>
+                        </div>
+        
+                        <div id="input-row">
+                            <input class="form-control" style="width: 100%;" type="text" id="email" name="email"     placeholder="请输入您的邮箱">
+                        </div>
+        
+                        <div id="input-row">
+                            <input class="form-control" style="width: 100%;" type="password" id="password" name="password"  placeholder="请输入密码">
+                            <div id='error' style="color:red;">{{ pwd }}</div>
+                        </div>
+        
+                        <div id="input-row">
+                            <input class="form-control" style="width: 100%;" type="password" id="password" name="password2"  placeholder="请确认密码">
+                            <div id='error' style="color:red">{{ cfm_pwd }}</div>
+                         </div>
+                        <button id="register" class="btn btn-primary" type="submit"><p>注册</p></button>
+                        
+                        {% endif %}
+                        
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+    var piece_dict = {{ piece_dict|safe }};
+    var index=0;
+    var len_index={{ len_dict|safe }};
+    var timer = setInterval("qiehuan(1)",6000);
+
+    $('#base0').css("background-image", "url("+piece_dict['pics'][0]+")");
+    $('#base1').css("background-image", "url("+piece_dict['pics'][0]+")");
+
+    function timer_stop(){
+        clearTimeout(timer);
+    }
+    function timer_start(){
+        timer = setInterval("qiehuan(1)",6000);
+    }
+    function qiehuan(i){
+        timer_stop();
+        index=index + i;
+        if (index == len_index) {
+            index=0;
+        } else if (index < 0) {
+            index = len_index - 1;
+        };
+        console.log(index);
+        $('#base0').css("background-image", "url("+piece_dict['pics'][index]+")");
+        $('#base1').fadeOut(1000, function(){
+            $('#base1').css("background-image", "url("+piece_dict['pics'][index]+")");
+            $('#base1').fadeIn(1000, timer_start());
+        });
+    }
+</script>
+{% endblock %}

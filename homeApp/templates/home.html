@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+    <button id="btn_prev" class="carousel-control-prev" type="button" onclick="qiehuan(-1)">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+    <div class="container" data-bs-theme="dark" style="width: 100%; height: 100%;">
+        <div class="row" style="height: 50vh;"></div>
+        <div class="row">
+            <a id="jum_link" href="/m/movie/{{ piece_dict.id.0 }}" style="text-decoration: none;">
+                <div id="jum_content" class="col-md-10 col-12 glass-style">
+                    <h1 id="jum_name">{{ piece_dict.name.0 }}</h1>
+                    <h5 id="jum_intro">{{ piece_dict.intro.0 }}</h5>
+                    <div class="btn btn-primary">查看详情</div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <button id="btn_next" class="carousel-control-next" type="button" onclick="qiehuan(1)">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+{% endblock %}
+
+{% block script %}
+<style type="text/css">
+    body{
+        background-color:rgb(26, 26, 26);
+    }
+</style>
+<script type="text/javascript">
+    var piece_dict = {{ piece_dict|safe }};
+    var index=0;
+    var len_index={{ len_dict|safe }};
+    var timer = setInterval(function() {
+        qiehuan(1);
+    }, 6000);
+    $('#jum_name').text(piece_dict['name'][0]);
+    $('#jum_intro').text(piece_dict['intro'][0]);
+    $('#base0').css("background-image", "url("+piece_dict['pics'][0]+")");
+    $('#base1').css("background-image", "url("+piece_dict['pics'][0]+")");
+
+    $('#jum_name').text(piece_dict['name'][0]);
+    $('#jum_intro').text(piece_dict['intro'][0]);
+    $('#jum_link').attr("href", "/m/movie/"+piece_dict['id'][0]);
+    function set_timer(){
+        timer = setInterval(function() {
+            qiehuan(1);
+        }, 6000);
+    }
+    function qiehuan(i){
+        // $('#btn_prev').attr("onclick","");
+        // $('#btn_next').attr("onclick","");
+        $("#btn_prev").attr("disabled","disabled");
+        $("#btn_next").attr("disabled","disabled");
+        clearInterval(timer)
+        index=index + i;
+        if (index == len_index) {
+            index=0;
+        } else if (index < 0) {
+            index = len_index - 1;
+        };
+        console.log(index);
+        $('#jum_content').fadeOut(1000, function(){
+            $('#jum_name').text(piece_dict['name'][index])
+            $('#jum_intro').text(piece_dict['intro'][index])
+            $('#jum_link').attr("href", "/m/movie/"+piece_dict['id'][index]);
+            $('#jum_content').fadeIn(1000, function(){
+                set_timer();
+                $("#btn_prev").removeAttr("disabled");
+                $("#btn_next").removeAttr("disabled");
+            });
+        });
+        $('#base0').css("background-image", "url("+piece_dict['pics'][index]+")");
+        $('#base1').fadeOut(1000, function(){
+            $('#base1').css("background-image", "url("+piece_dict['pics'][index]+")");
+            $('#base1').fadeIn(1000, function(){});
+        });
+    }
+</script>
+
+<script type="text/JavaScript">
+    $('#{{active_menu}}').addClass("active");
+</script>
+<script type="text/JavaScript">
+    $('#jum_{{pieces.0.id}}').addClass("active");
+</script>
+{% endblock %}

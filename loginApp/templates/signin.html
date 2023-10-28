@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}注册{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/login_style.css' %}">
+{% endblock css %}
+    
+
+{% block content %}
+    <div class="container content">
+        <div class="row">
+            <h2>register</h2>
+            {% if userNotExist %}
+            <div class="row">
+                <div class="alert alert-warning col-md-3">用户名或密码错误</div>
+            </div>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <div id="input-row">
+                    <label for="username">Username:</label>
+                    <input class="form-control"  type="text" id="username" name="username"    placeholder="请输入账号">
+                    <div id='error' style="color:red">{{ userid }}</div>
+                </div>
+
+                <div id="input-row">
+                    <label for="email">email:</label>
+                    <input class="form-control" type="text" id="email" name="email"     placeholder="请输入您的邮箱">
+                </div>
+
+                <div id="input-row">
+                    <label for="password">Password:</label>
+                    <input class="form-control" type="password" id="password" name="password"  placeholder="请输入密码">
+                    <div id='error' style="color:red;">{{ pwd }}</div>
+                </div>
+
+                <div id="input-row">
+                    <label for="password">Password:</label>
+                    <input class="form-control" type="password" id="password" name="password2"  placeholder="请确定密码">
+                    <div id='error' style="color:red">{{ cfm_pwd }}</div>
+                 </div>
+                
+                <button id="register" class="btn btn-primary" type="submit"><p>注册</p></button>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block script %}
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}预订成功{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="sub-head" id="head">预订成功</h1>
+        <div class="row">
+            <!-- pics -->
+            <div class="col-md-5">
+            </div>
+            <!-- details -->
+            <div class="col-md-6 ">
+                <div class="card letter" style="aspect-ratio: 4/3">
+                    <div class="d-flex align-content-center justify-content-center m-3" style="height: 100%;">
+                        <div class="align-self-center m-3" 
+                            style="background-image: url('{{movie.photo.url}}');
+                                    width: 35%; aspect-ratio: 1/1;
+                                    background-size: cover;
+                                    border-radius: 6px;">
+                        </div>
+                        <div class="align-self-center m-3" 
+                            style="width: 200px; height: 200px;
+                                background-size: cover;
+                                border-radius: 6px;">
+                            <p>片名: {{session.movie.name}}</p>
+                            <p>时间: {{session.time.year}}年{{session.time.month}}月{{session.time.day}}日 {{session.time.hour}}:{{session.time.minute}}</p>
+                            <p>放映厅: {{session.location.name}}</p>
+                            <p>票价: {{session.charge}}</p>
+                            <p><span id="countdown">3</span>秒后进入我的订单</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<style type="text/css">
+    body{
+        background-image:url("{% static '/img/evelope.png' %}");
+    }
+</style>
+
+<script>
+    var timeleft = 2;
+    var countdown = setInterval(function(){
+      $("#countdown").text(timeleft);
+      timeleft--;
+      if (timeleft < 0) {
+        clearInterval(countdown);
+        window.location.href = "{% url 'loginApp:user_url' 'order' %}";
+      }
+    }, 1000);
+</script>
+<!-- <script type="text/JavaScript">
+    $('#base0').css("background-image", "url('{% static '/img/evelope.png' %}')");
+</script> -->
+{% endblock %}

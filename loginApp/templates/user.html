@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{productName}}-个人中心{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <h1 class="sub-head">个人中心</h1>
+                <div class="model-list">
+                    <ul class="list-group">
+                        <a href="{% url 'loginApp:user_url' 'info' %}" class="list-group-item" id="info">账户信息</a>
+                        <a href="{% url 'loginApp:user_url' 'order' %}" class="list-group-item" id="order">我的订单</a>
+                        <a href="{% url 'loginApp:user_url' 'favorites' %}" class="list-group-item" id="favorites">我的收藏</a>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-9" id="info_content">
+                <h1 class="sub-head">{{productName}}</h1>
+                <div class="card">
+                    <div class="card-body">
+                    {% if active_submenu == 'info' %}
+                    <div class="d-flex align-items-center ">
+                        <div class="mx-3" style=" width: 40vh;">
+                            <img class="img-fluid mb-2" style="border-radius: 50%;" src="{{user.other.photo.url}}" alt="">
+                        </div>
+                        <div class="mx-3" >
+                            <h2 class="mb-3">{{user.username}}</h2>
+                            <p>邮箱：{{user.email}}</p>
+                            <p>
+                                <button type="button" class="btn btn-primary mb-1" data-bs-toggle="modal" data-bs-target="#avatarModal">修改头像</button>
+                                <a class="btn btn-primary mb-1" href="{% url 'loginApp:Repassword2' %}">更改密码</a>
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if active_submenu == 'order' %}
+                        <div class="row">
+                            <div class="btn-group">
+                                <a href="?active_status=1" id="status_added" class="btn btn-outline-primary">已下单</a>
+                                <a href="?active_status=-1" id="status_canceled" class="btn btn-outline-primary">已取消</a>绩
+                                设置
+                                排行榜
+                            </div>
+                        </div>
+                        {% for ticket in tickets %}
+                        <a href="{% url 'productApp:ticket_url' ticket.id %}" class="d-flex my-2" style="width: 100%; text-decoration: none;">
+                            <div style="background-image: url('{{ticket.session.movie.photo.url}}');
+                                width: 90px; aspect-ratio: 1/1;
+                                background-size: cover;
+                                border-top-left-radius: 6px;
+                                border-bottom-left-radius: 6px;">
+                            </div>
+                            <div class="card" style="width: 100%; border-bottom-left-radius: 0px; border-top-left-radius: 0px; border-left: 0px;">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ticket.session.movie.name}}</h5>
+                                    <span class="card-text">{{ticket.session.time.year}}年{{ticket.session.time.month}}月{{ticket.session.time.day}}日</span>
+                                    <span>{{ticket.session.time.hour}}:{{ticket.session.time.minute}}</span>
+                                    <span class="card-text">{{ticket.session.location}}</span>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if active_submenu == 'favorites' %}
+                        <div class="row">
+                            {% for movie in user.other.favorite.all %}
+                            <div class="col-md-4 col-6">
+                                <div class="card">
+                                    <!-- todo: link -->
+                                    <img src="{{movie.photo.url}}" class="card-img-top" alt="" style="height: 200px; width: 100%;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{movie.name}}</h5>
+                                        <p class="mb-0">{{movie.rate}}分  {{movie.time_publish.year}} </p>
+                                        <p>{% for label in movie.label.all %} {{label}} {% endfor %} {% if movie.showing %}<span class="badge text-bg-danger">正在上映</span>{% endif %}</p>
+                                        <a href="{% url 'productApp:movie_url' movie.id %}" class="btn btn-primary">详情</a>
+                                        <a href="{% url 'productApp:del_fav_url' movie.id %}" class="btn btn-danger">取消收藏</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>    
+    </div>
+    <!-- else -->
+    <!-- endif -->
+{% endblock %}
+
+{% block script %}
+
+<script type="text/JavaScript">
+    $('#status_{{active_status}}').addClass("active");
+</script>
+<script type="text/JavaScript">
+    $('#{{active_submenu}}').addClass("active");
+</script>
+<!-- Ajax脚本 -->
+
+<script>
+    $(function() {
+      // Ajax上传头像
+      $('#uploadAvatarBtn').click(function() {
+        var formData = new FormData($('#avatarForm')[0]);
+        $.ajax({
+          url: '{% url "loginApp:upload_avatar" %}',
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function(data) {
+            if (data.success) {
+              $('#avatarModal').modal('hide');
+              alert('头像上传成功！');
+              location.reload();
+            } else {
+              alert('头像上传失败！');
+            }
+          }
+        });
+      });
+    });
+</script>
+{% endblock %}

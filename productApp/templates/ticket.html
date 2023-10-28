@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}我的订单{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="sub-head" id="head">我的订单</h1>
+        <div class="row">
+            <!-- pics -->
+            <div class="col-md-5">
+            </div>
+            <!-- details -->
+            <div class="col-md-6 ">
+                <div class="card letter" style="aspect-ratio: 4/3">
+                    <div class="d-flex align-content-center justify-content-center m-3" style="height: 100%;">
+                        <div class="align-self-center m-3" 
+                            style="background-image: url('{{movie.photo.url}}');
+                                    width: 35%; aspect-ratio: 1/1;
+                                    background-size: cover;
+                                    border-radius: 6px;">
+                        </div>
+                        <div class="align-self-center m-3" 
+                            style="width: 200px; height: 200px;
+                                background-size: cover;
+                                border-radius: 6px;">
+                            <p class="m-1">片名: {{session.movie.name}}</p>
+                            <p class="m-1">场次: {{session.time.year}}年{{session.time.month}}月{{session.time.day}}日 {{session.time.hour}}:{{session.time.minute}}</p>
+                            <p class="m-1">放映厅: {{session.location.name}}</p>
+                            <p class="m-1">票价: {{session.charge}}</p>
+                            <p class="m-1">下单时间：{{ticket.time_create.year}}年{{ticket.time_create.month}}月{{ticket.time_create.day}}日 {{ticket.time_create.time}}</p>
+                            {% if ticket.status == 1 %}
+                            <p class="m-1">状态: 已下单</p>
+                            <a class="btn btn-danger" href="{% url 'loginApp:del_ticket_url' ticket.id %}">取消订单</a>
+                            {% else %}
+                            <p class="m-1">状态: 已取消</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<style type="text/css">
+    body{
+        background-image:url("{% static '/img/evelope.png' %}");
+    }
+</style>
+<!-- <script type="text/JavaScript">
+    $('#base0').css("background-image", "url('{% static '/img/evelope.png' %}')");
+</script> -->
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+product
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- pics -->
+        <div class="col-md-4">
+            <div class="d-flex align-content-center justify-content-center">
+                <div class="pic-head" style="background-image:
+                    url('{{movie.photo.url}}');">
+                </div>
+            </div>
+        </div>
+        <!-- details -->
+        <div class="col-md-8">
+            <h1 class="sub-head">《{{movie.name}}》的场次</h1>
+            <div class="card text-center">
+                <div class="card-header">
+                    <ul class="nav nav-pills card-header-pills">
+                        {% for date in dates %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url
+                                'productApp:order_url' movie.id
+                                %}?date={{date}}" id="date_{{date}}">{{date}}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for session in sessions %}
+                        <!-- ?? -->
+                        <div class="col-md-3 col-6">
+                            <div class="card session-choice">
+                                <div class="card-body">
+                                    <p class="card-text">{{session.time.time}}
+                                        {{session.location.name}}厅</p>
+                                    <p class="card-text"></p>
+                                    <p class="card-text">还剩{{session.last_seats}}个座位</p>
+                                    <p class="card-text">¥{{session.charge}}</p>
+                                    <a class="btn btn-success" href="{% url 'productApp:ordering_url' session.id %}">预定</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <a href="" class="btn btn-danger">想看</a>
+                <a href="{% url 'productApp:movie_url' movie.id %}" class="btn
+                    btn-primary">评价</a>
+                {% if movie.showing %}
+                <a href="{% url 'productApp:order_url' movie.id %}" class="btn
+                    btn-success">购票</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-9">
+
+            <h2 class="sub-head">短评</h2>
+            <!-- todo:写评论 -->
+            {% if user.is_authenticated %}
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <input type="text" id="comment" name="comment" style="width:70%" placeholder="请输入评论">
+                    <input type="text" name="mark" width="30%" placeholder="请输入评分(0-5)">
+                    <button class="btn btn-success" type="submit">提交</button>
+                    <p style="color:red">{{error.comment}}</p>
+                </form>
+            {% else %}
+                <p>请登录之后再发表评论。</p>
+            {% endif %}
+
+            {% for review in reviews %}
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-title">{{review.user}}</p>
+                    <h6 class="card-subtitle mb-2 text-muted">{{review.mark}}</h6>
+                    <p>{{review.body}}</p>
+                    <button class="btn btn-light">赞同</button>
+                    <button class="btn btn-light">反对</button>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+        <div class="col-md-3">
+            <h2 class="sub-head">剧照</h2>
+                <div id="filmstrip">
+                    {% for pic in pics %}
+                    <div class="film">
+                        <img src="{{pic.pic.url}}" alt="剧照">
+                    </div>
+                    {% endfor %}
+                </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="text/JavaScript">
+$('#date_{{current_date}}').addClass("active");
+</script>
+<style type="text/css">
+    body{
+        background-image: linear-gradient(-10deg, rgba(231, 230, 230, 0.2) 0%, rgb(231, 230, 230) 30%), url('{{pics.0.pic.url}}');    }
+</style>
+{% endblock %}

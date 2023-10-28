@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>(　o=^•ェ•)o　{% block title %}{% endblock %}</title>
+    <link rel="icon" href="{% static '/bootstrap-icons-1.10.5/pie-chart-fill.svg' %}" sizes="16x16">
+    <link rel="stylesheet" href="{% static '/bootstrap/dist/css/bootstrap.min.css' %}">
+    <script src="{% static '/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static '/bootstrap-icons-1.10.5/font/bootstrap-icons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/query.min.js' %}"></script>
+    {% block css %}{% endblock css %}
+</head>
+
+<body>
+    <!-- 导航条 -->
+    <nav class="navbar bg-dark navbar-expand-lg bd-navbar sticky-top" data-bs-theme="dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <span><i class="bi bi-pie-chart-fill"></i> 嫌疑喵X的献声</span>
+            </a>
+            <button class="navbar-toggler toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation" _msthidden="A" _mstaria-label="320099" _msthash="393">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarScroll">
+                <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+                    <li class="nav-item subject">
+                        <a class="nav-link" id="home" aria-current="page" href="{% url 'home' %}">首页</a>
+                    </li>
+                    <li class="nav-item subject">
+                        <a class="nav-link" id="product" href="{% url 'productApp:product' 'all' %}">电影</a>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a class="nav-link" id="about" href="{% url 'aboutApp:about' %}">关于</a>
+                    </li> -->
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if request.user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle subject" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                            <img class="img-fluid" style="border-radius: 50%; height: 22px;" src="{{request.user.other.photo.url}}" alt="">
+                            {{request.user}}
+                        </a>
+                        <ul class="dropdown-menu">
+                          <li><a class="dropdown-item" href="{% url 'loginApp:user_url' 'info' %}">账户信息</a></li>
+                          <li><a class="dropdown-item" href="{% url 'loginApp:user_url' 'order' %}">我的订单</a></li>
+                          <li><a class="dropdown-item" href="{% url 'loginApp:user_url' 'favorites' %}">我的收藏</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li><a class="dropdown-item" href="{% url 'loginApp:logout_url' %}?next={% firstof request.path '/' %}">注销</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <a type="button" class="btn btn-success navbar-btn" href="{% url 'loginApp:login_url' %}?next={% firstof request.path '/' %}">登录</a>
+                    <a type="button" class="btn btn-dark navbar-btn" href="{% url 'loginApp:signin_url' %}?next={% firstof request.path '/' %}">注册</a>
+                    {% endif %}
+                </ul>
+                <form action="{% url 'productApp:search_url' %}" method="get" class="d-flex" role="search">
+                    <div class="input-group">
+                        <input class="form-control" type="search" placeholder="发现电影" name="s_movie" aria-label="search" aria-describedby="button-addon2">
+                        <button class="btn btn-outline-secondary" type="submit" id="button-addon2">搜索</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <div class="base" id="base0" style="position: relative;">
+        <div class="base" id="base1" style="position: absolute;">
+        </div>
+        <div class="base" style="z-index: 2; position: absolute;">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Bootstrap模态框 -->
+    <div class="modal" id="avatarModal" tabindex="-1" role="dialog" aria-labelledby="avatarModalLabel" aria-hidden="true" data-backdrop="false">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="avatarModalLabel">上传头像</h5>
+                </div>
+                <div class="modal-body">
+                <form id="avatarForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" name="avatar" accept="image/*">
+                </form>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="uploadAvatarBtn">上传</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+{% block script %}{% endblock %}
+
+<script type="text/JavaScript">
+    $('#{{active_menu}}').addClass("active");
+</script>
+
+</html>
